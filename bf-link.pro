@@ -11,28 +11,17 @@ QT       -= gui
 TARGET = bf-link
 TEMPLATE = lib
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 DEFINES += BFLINK_LIBRARY
 
-SOURCES += bflink.cpp
+SOURCES += bflink.cpp \
+           netlink_socket.cpp
 
 HEADERS += bflink.h\
-        bf-link_global.h
+        bf-link_global.h\
+        netlink_socket.h
 
-symbian {
-    MMP_RULES += EXPORTUNFROZEN
-    TARGET.UID3 = 0xE10DE810
-    TARGET.CAPABILITY = 
-    TARGET.EPOCALLOWDLLDATA = 1
-    addFiles.sources = bf-link.dll
-    addFiles.path = !:/sys/bin
-    DEPLOYMENT += addFiles
-}
+INCLUDEPATH += ../bf-ko
 
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}
+DESTDIR = ../../lib

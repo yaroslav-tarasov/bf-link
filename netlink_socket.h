@@ -3,15 +3,16 @@
 
 #include <QObject>
 #include <memory>
+#include "bf-link_global.h"
 
 class NetlinkSocketPrivate;
 
-class NetlinkSocket : public QObject
+class BFLINKSHARED_EXPORT NetlinkSocket : public QObject
 {
     Q_OBJECT
 public:
     explicit NetlinkSocket(QObject *parent = 0);
-    void     SendMsg(void* msg,size_t size);
+    void     SendMsg(int type, void* msg, size_t size);
     void     Create();
 protected:
 
