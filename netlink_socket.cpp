@@ -4,8 +4,6 @@
 #include <linux/if_ether.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-//#include <netlink/netlink.h>
-//#include <netlink/handlers.h>
 #include <linux/netlink.h>
 #include "trx_data.h"
 /////

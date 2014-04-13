@@ -6,6 +6,11 @@
 #include <linux/if_ether.h>
 #include "trx_data.h"
 
+//
+//   Maybe better?
+//   http://stackoverflow.com/questions/11033971/qt-thread-with-movetothread
+//
+
 class NetlinkSocketPrivate
 {
 public:
@@ -25,6 +30,7 @@ public:
 
       return nls?0:1;
     }
+
 
     inline int  connect (int protocol)
     {
@@ -67,11 +73,17 @@ public:
 
 
 NetlinkSocket::NetlinkSocket(QObject *parent) :
-    QObject(parent)
+    QObject(parent),mRunning(true)
 {
     d.reset(new NetlinkSocketPrivate(this));
-
+    //d->nls->h_fd;
 }
+
+NetlinkSocket::~NetlinkSocket()
+{
+    NetlinkSocket::close();
+    // d->t->join();
+};
 
 int NetlinkSocket::create(int proto,int buffsize)
 {
@@ -97,26 +109,39 @@ int NetlinkSocket::create(int proto,int buffsize)
    return ret;
 }
 
+void NetlinkSocket::close()
+{
+    mRunning = false;
+    if(d->nls)
+    {
+        nl_close(d->nls);
+        nl_handle_destroy(d->nls);
+        d->nls = NULL;
+    }
+}
+
 void NetlinkSocket::runListener()
 {
     int ret;
     unsigned char *nl_msg;
-
-    if( (ret = d->recv (NULL, &nl_msg, NULL)))
+    while (mRunning)
     {
-        struct nlmsghdr * hdr = (struct nlmsghdr *) nl_msg;
-        if(hdr->nlmsg_len > 0)
+        if( (ret = d->recv (NULL, &nl_msg, NULL)) > 0)
         {
-            QByteArray ba(reinterpret_cast<const char*>(nl_msg),hdr->nlmsg_len);
-            qDebug() << "nlmsg_type: " <<  hdr->nlmsg_type << "nlmsg_len: " << hdr->nlmsg_len ;
-            emit  data(ba);
+            struct nlmsghdr * hdr = (struct nlmsghdr *) nl_msg;
+            if(hdr->nlmsg_len > 0)
+            {
+                QByteArray ba(reinterpret_cast<const char*>(nl_msg),hdr->nlmsg_len);
+                qDebug() << "nlmsg_type: " <<  hdr->nlmsg_type << "nlmsg_len: " << hdr->nlmsg_len ;
+                emit  data(ba);
+            }
+        }
+        else
+        {
+            if(mRunning)
+                emit error(QString("Got error on recieve: %1").arg(ret));
         }
     }
-    else
-    {
-        emit error(QString("Got error on recieve: %1").arg(ret));
-    }
-
     return;
 }
 
