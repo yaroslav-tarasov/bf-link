@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network xml
+QT       += network xml threads
 
 QT       -= gui
 
@@ -16,11 +16,13 @@ QMAKE_CXXFLAGS += -std=c++0x
 DEFINES += BFLINK_LIBRARY
 
 SOURCES += bflink.cpp \
-           netlink_socket.cpp
+           netlink_socket.cpp \
+           netlinksocket.cpp
 
 HEADERS += bflink.h\
         bf-link_global.h\
-        netlink_socket.h
+        netlink_socket.h \
+        netlinksocket.h
 
 INCLUDEPATH += ../bf-ko
 

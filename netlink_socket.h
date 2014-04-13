@@ -5,15 +5,21 @@
 #include <memory>
 #include "bf-link_global.h"
 
+
+namespace test
+{
+
+
 class NetlinkSocketPrivate;
 
-class BFLINKSHARED_EXPORT NetlinkSocket : public QObject
+class /*BFLINKSHARED_EXPORT*/ NetlinkSocket : public QObject
 {
     Q_OBJECT
 public:
     explicit NetlinkSocket(QObject *parent = 0);
-    void     SendMsg(int type, void* msg, size_t size);
-    void     Create();
+    ~NetlinkSocket();
+    int sendMsg(int type, void* msg, size_t size);
+    int create(int proto);
 protected:
 
 signals:
@@ -26,4 +32,5 @@ protected:
    int mBuffSize;
 };
 
+}
 #endif // NETLINK_SOCKET_H
